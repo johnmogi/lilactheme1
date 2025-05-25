@@ -1,0 +1,163 @@
+/* Quiz Navigation Buttons */
+.quiz-navigation-container {
+    text-align: center;
+    margin: 40px 0 20px;
+    padding: 20px 0;
+    width: 100%;
+    clear: both;
+    position: relative;
+    z-index: 10;
+}
+
+/* Ensure buttons are properly aligned */
+.wpProQuiz_page .wpProQuiz_QuestionButton {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    margin: 0 10px !important;
+    padding: 12px 30px !important;
+    border-radius: 50px !important;
+    border: none !important;
+    background: #4CAF50 !important;
+    color: white !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    text-align: center !important;
+    min-width: 120px;
+    height: auto;
+    line-height: normal;
+    font-size: 16px;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+/* Back button specific styles */
+.wpProQuiz_page input[name="back"] {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+}
+
+/* Hover effects */
+.wpProQuiz_page .wpProQuiz_QuestionButton:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
+}
+
+/* Active state */
+.wpProQuiz_page .wpProQuiz_QuestionButton:active {
+    transform: translateY(1px) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Disabled state */
+.wpProQuiz_page .wpProQuiz_QuestionButton:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* ============================================
+   Quiz Type Specific Styles
+   ============================================ */
+
+/* Common styles for all quiz types */
+.wpProQuiz_quiz .wpProQuiz_QuestionButton {
+    transition: all 0.3s ease;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0 10px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Normal Quiz Type */
+body.quiz-type-normal .wpProQuiz_quiz {
+    /* Add any specific styles for normal quizzes */
+}
+
+body.quiz-type-normal .wpProQuiz_QuestionButton[type="button"] {
+    background-color: #4CAF50;
+    color: white;
+}
+
+body.quiz-type-normal .wpProQuiz_QuestionButton[type="button"]:hover {
+    background-color: #3e8e41;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Forced Hint Quiz Type */
+body.quiz-type-forced-hint .wpProQuiz_quiz {
+    /* Add any specific styles for forced hint quizzes */
+}
+
+/* Hide Next/Submit buttons on forced hint quizzes */
+body.quiz-type-forced-hint .wpProQuiz_page input[name="next"],
+body.quiz-type-forced-hint .quiz-navigation-container input[name="next"],
+body.quiz-type-forced-hint input.wpProQuiz_QuestionButton[value="הבא"],
+body.quiz-type-forced-hint input.wpProQuiz_QuestionButton[value="Next"],
+body.quiz-type-forced-hint input.wpProQuiz_QuestionButton[value="סיים מבחן"],
+body.quiz-type-forced-hint input.wpProQuiz_QuestionButton[value="Complete Quiz"],
+body.quiz-type-forced-hint .wpProQuiz_page .wpProQuiz_QuestionButton[type="button"],
+body.quiz-type-forced-hint .wpProQuiz_quiz .wpProQuiz_listItem .wpProQuiz_QuestionButton[value="הבא"],
+body.quiz-type-forced-hint .wpProQuiz_quiz .wpProQuiz_listItem .wpProQuiz_QuestionButton[value="Next"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+}
+
+/* Style the hint button more prominently on forced hint quizzes */
+body.quiz-type-forced-hint .wpProQuiz_QuestionButton[value="Hint"] {
+    background-color: #ff9800;
+    color: white;
+    font-weight: bold;
+    padding: 15px 35px;
+    font-size: 1.1em;
+}
+
+body.quiz-type-forced-hint .wpProQuiz_QuestionButton[value="Hint"]:hover {
+    background-color: #e68a00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .quiz-navigation-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 0;
+        margin: 30px 0 10px;
+    }
+    
+    .wpProQuiz_page .wpProQuiz_QuestionButton {
+        width: 90%;
+        max-width: 280px;
+        margin: 0 auto 10px !important;
+        padding: 10px 20px !important;
+        font-size: 15px !important;
+    }
+    
+    /* Ensure buttons are properly stacked on mobile */
+    .quiz-navigation-container input[type="button"] {
+        display: block !important;
+        width: 90% !important;
+        max-width: 280px !important;
+        margin: 0 auto 10px !important;
+    }
+}
