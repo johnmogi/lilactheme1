@@ -78,7 +78,9 @@
 
 /* Normal Quiz Type */
 body.quiz-type-normal .wpProQuiz_quiz {
-    /* Add any specific styles for normal quizzes */
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 body.quiz-type-normal .wpProQuiz_QuestionButton[type="button"] {
@@ -94,7 +96,10 @@ body.quiz-type-normal .wpProQuiz_QuestionButton[type="button"]:hover {
 
 /* Forced Hint Quiz Type */
 body.quiz-type-forced-hint .wpProQuiz_quiz {
-    /* Add any specific styles for forced hint quizzes */
+    background-color: #f5f8ff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e6e9f0;
 }
 
 /* Hide Next/Submit buttons on forced hint quizzes */
@@ -552,22 +557,25 @@ body.quiz-type-forced-hint .wpProQuiz_QuestionButton[value="Hint"]:hover {
     grid-row: 1;
 }
 
-.wpProQuiz_reviewQuestion li {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    background: #666666; /* Dark gray background from screenshot */
-    border-radius: 0; /* Square buttons as shown in screenshot */
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff; /* White text */
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-    margin: 0 auto;
-    box-shadow: none;
+.wpProQuiz_reviewQuestion li,
+.wpProQuiz_reviewQuestion ol li,
+.wpProQuiz_reviewDiv .wpProQuiz_reviewQuestion li {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    background: #ffffff !important; /* White background */
+    background-color: #ffffff !important;
+    border-radius: 0 !important; /* Square buttons as shown in screenshot */
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #333333 !important; /* Dark text for contrast */
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid #e0e0e0 !important; /* Light border for definition */
+    margin: 0 auto !important;
+    box-shadow: none !important;
 }
 
 /* Remove ALL scroll indicators and behavior */
@@ -623,36 +631,52 @@ body.quiz-type-forced-hint .wpProQuiz_QuestionButton[value="Hint"]:hover {
 
 /* Hover and active states */
 .wpProQuiz_reviewQuestion li:not(.wpProQuiz_reviewQuestionSolved):not(.wpProQuiz_reviewQuestionTarget):hover {
-    background: #555555;
-    color: white;
+    background: #f5f5f5;
+    color: #000000;
+    border-color: #cccccc;
 }
 
 /* Answered questions */
 .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionSolved {
-    background: #01AF6B; /* Green color from screenshot */
-    color: white;
-    font-weight: normal;
-    border: none;
+    background: white;
+    color: #01AF6B; /* Green text */
+    font-weight: bold;
+    border: 2px solid #01AF6B; /* Green border */
 }
 
 /* Current question */
 .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionTarget {
-    background: #00A99D; /* Teal color from screenshot */
-    color: white;
-    font-weight: normal;
-    border: none;
-    box-shadow: none;
+    background: white;
+    color: #00A99D; /* Teal text */
+    font-weight: bold;
+    border: 2px solid #00A99D; /* Teal border */
+    box-shadow: 0 0 0 2px rgba(0, 169, 157, 0.3);
     transform: none;
 }
 
 /* Add a brighter active state for the current target that's also solved */
 .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionTarget.wpProQuiz_reviewQuestionSolved {
-    background: #00A99D; /* Keep teal for the current question */
-    border: none;
-    box-shadow: none;
+    background: white;
+    color: #00A99D; /* Teal text */
+    border: 2px solid #00A99D; /* Teal border */
+    box-shadow: 0 0 0 2px rgba(1, 175, 107, 0.3);
 }
 
 /* Responsive adjustments for the grid */
+@media (max-width: 767px) {
+    .wpProQuiz_reviewQuestion ol {
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wpProQuiz_reviewQuestion li {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}
+
 @media (max-width: 600px) {
     .wpProQuiz_reviewQuestion ol {
         grid-template-columns: repeat(5, 1fr);
