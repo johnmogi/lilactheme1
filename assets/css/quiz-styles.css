@@ -282,14 +282,7 @@ body.quiz-type-forced-hint .wpProQuiz_QuestionButton[value="Hint"]:hover {
     position: relative;
 }
 
-/* Inject progress bar structure */
-.wpProQuiz_listItem::before {
-    content: '';
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 60px;
-}
+
 
 .wpProQuiz_progress {
     display: flex;

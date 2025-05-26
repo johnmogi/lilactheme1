@@ -55,20 +55,54 @@ if (!function_exists('enqueue_custom_scripts')) {
             wp_get_theme()->get('Version')
         );
         
-        // Enqueue Toast message system
+        // Debugging - output theme directory for checking paths
+        error_log('Theme Directory: ' . get_stylesheet_directory_uri());
+        
+        // Force script versions to prevent caching during development
+        $force_version = time();
+        
+        // Enqueue Toast message system - with absolute path to ensure loading
         wp_enqueue_script(
             'toast-message-system',
-            get_stylesheet_directory_uri() . '/js/toast-system.js',
+            get_stylesheet_directory_uri() . '/includes/messaging/js/toast-system.js',
             ['jquery'],
-            wp_get_theme()->get('Version'),
-            true
+            $force_version,
+            false // Load in header to ensure it's available early
+        );
+        
+        // Enqueue our simple test script
+        wp_enqueue_script(
+            'toast-test-script',
+            get_stylesheet_directory_uri() . '/includes/messaging/js/toast-test.js',
+            ['jquery'],
+            $force_version,
+            false // Load in header to make testing easier
+        );
+        
+        // Enqueue Alert Helpers (depends on toast system)
+        wp_enqueue_script(
+            'alert-helpers',
+            get_stylesheet_directory_uri() . '/includes/messaging/js/alert-helpers.js',
+            ['jquery', 'toast-message-system'],
+            $force_version,
+            false // Load in header to ensure it's available early
         );
         
         // Localize toast settings
         wp_localize_script('toast-message-system', 'toastSettings', [
             'defaultDuration' => 5000,
-            'position' => 'top-right'
+            'position' => 'top-right',
+            'enableAlertIntegration' => true,
+            'debugMode' => true
         ]);
+        
+        // Add inline script for immediate testing
+        wp_add_inline_script('toast-message-system', '
+            console.log("Inline script test: Toast system is being loaded");
+            jQuery(document).ready(function($) {
+                console.log("DOM ready - Toast system should be available");
+            });
+        ');
         
         // Enqueue Bootstrap Toast CSS
         wp_enqueue_style(

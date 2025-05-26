@@ -9,6 +9,11 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+// Define plugin constants
+if (!defined('LILAC_QUIZ_FOLLOWUP_VERSION')) {
+    define('LILAC_QUIZ_FOLLOWUP_VERSION', '1.0.0');
+}
+
 /**
  * Change Add to Cart button text for WooCommerce
  */
@@ -115,6 +120,9 @@ add_action('wp_enqueue_scripts', 'hello_elementor_child_scripts_styles', 20);
 // Load other theme files
 require_once get_stylesheet_directory() . '/inc/shortcodes/loader.php';
 
+// Load Quiz Follow-up System
+require_once get_stylesheet_directory() . '/includes/messaging/class-quiz-followup.php';
+
 // Load Ultimate Member integration if UM is active
 function ccr_load_um_integration() {
     if (class_exists('UM')) {
@@ -130,8 +138,138 @@ function ccr_load_messaging_system() {
     if (is_admin()) {
         require_once get_stylesheet_directory() . '/includes/messaging/admin-functions.php';
     }
+    
+    // Enqueue toast system and alert integration scripts
+    add_action('wp_enqueue_scripts', 'lilac_enqueue_toast_system');
+    add_action('wp_footer', 'lilac_add_toast_debug_code');
 }
 add_action('after_setup_theme', 'ccr_load_messaging_system', 10);
+
+/**
+ * Enqueue Toast Notification System scripts
+ */
+function lilac_enqueue_toast_system() {
+    // Force script versions to prevent caching during development
+    $force_version = time();
+    
+    // Enqueue jQuery as a dependency
+    wp_enqueue_script('jquery');
+    
+    // Enqueue Toast message system CSS FIRST
+    wp_enqueue_style(
+        'toast-system-css',
+        get_stylesheet_directory_uri() . '/includes/messaging/css/toast-system.css',
+        [],
+        $force_version
+    );
+    
+    // Enqueue Toast message system
+    wp_enqueue_script(
+        'toast-message-system',
+        get_stylesheet_directory_uri() . '/includes/messaging/js/toast-system.js',
+        ['jquery'],
+        $force_version,
+        true // Load in footer for better performance
+    );
+    
+    // Enqueue Session Toast Extension
+    wp_enqueue_script(
+        'toast-session',
+        get_stylesheet_directory_uri() . '/includes/messaging/js/session-toast.js',
+        ['jquery', 'toast-message-system'],
+        $force_version,
+        true
+    );
+    
+    // Enqueue Test Timer Extension
+    wp_enqueue_script(
+        'toast-test-timer',
+        get_stylesheet_directory_uri() . '/includes/messaging/js/test-timer-toast.js',
+        ['jquery', 'toast-message-system'],
+        $force_version,
+        true
+    );
+    
+    // Enqueue Alert Helpers
+    wp_enqueue_script(
+        'alert-helpers',
+        get_stylesheet_directory_uri() . '/includes/messaging/js/alert-helpers.js',
+        ['jquery', 'toast-message-system'],
+        $force_version,
+        true
+    );
+    
+    // Enqueue Toast Extensions CSS
+    wp_enqueue_style(
+        'toast-extensions-css',
+        get_stylesheet_directory_uri() . '/includes/messaging/css/toast-extensions.css',
+        ['toast-system-css'],
+        $force_version
+    );
+    
+    // Localize toast settings
+    wp_localize_script('toast-message-system', 'toastSettings', [
+        'defaultDuration' => 5000,
+        'position' => 'top-right', // Make sure the position is set correctly
+        'enableAlertIntegration' => true,
+        'debugMode' => true
+    ]);
+    
+    // Add a small fix to make sure the toast container uses the correct position
+    wp_add_inline_script('toast-message-system', '
+        jQuery(document).ready(function($) {
+            // Force the container to use the correct position
+            if ($("#lilac-toast-container").length) {
+                $("#lilac-toast-container").attr("class", "top-right");
+                console.log("Toast container position set to top-right");
+            }
+        });
+    ');
+}
+
+/**
+ * Add debug code to test toast functionality
+ */
+function lilac_add_toast_debug_code() {
+    ?>
+    <script type="text/javascript">
+    /* Toast System Debug Code */
+    console.log('Toast Debug Script Loaded');
+    
+    // Create global test function
+    window.TestToast = function() {
+        console.log('Testing Toast System...');
+        
+        if (typeof window.LilacToast !== 'undefined') {
+            console.log('LilacToast API found!');
+            window.LilacToast.success('Toast API is working!', 'Success');
+            return 'Test successful';
+        } else {
+            console.log('LilacToast API not found');
+            alert('This is a native alert - LilacToast not loaded');
+            return 'Test failed';
+        }
+    };
+    
+    // Test alert integration
+    window.TestAlert = function(message) {
+        console.log('Testing Alert Integration...');
+        alert(message || 'This is a test alert');
+        return 'Alert test completed';
+    };
+    
+    // Log toast system status on page load
+    jQuery(document).ready(function($) {
+        console.log('Toast System Status:', {
+            'jQuery Loaded': typeof $ === 'function',
+            'LilacToast Available': typeof window.LilacToast === 'function',
+            'LilacShowToast Available': typeof window.LilacShowToast === 'function',
+            'Alert Overridden': window.alert !== window.originalAlert
+        });
+    });
+    </script>
+    <?php
+}
 
 // Load Login System
 function ccr_load_login_system() {
@@ -146,14 +284,11 @@ add_action('after_setup_theme', 'ccr_load_login_system', 10);
 // Add body class for quiz types
 add_filter('body_class', function($classes) {
     if (is_singular('sfwd-quiz')) {
-        $quiz_id = get_the_ID();
-        $enforce_hint = get_post_meta($quiz_id, 'enforce_hint', true);
-        
-        // Always add quiz type class
-        if ($enforce_hint === 'yes') {
-            $classes[] = 'quiz-type-forced-hint';
-        } else {
-            $classes[] = 'quiz-type-normal';
+        $classes[] = 'quiz-page';
+        // Add quiz ID as a body class
+        global $post;
+        if ($post) {
+            $classes[] = 'quiz-' . $post->ID;
         }
         
         // Backward compatibility

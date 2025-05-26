@@ -10,7 +10,8 @@ window.LilacToast = {
     success: null,
     error: null,
     warning: null,
-    info: null
+    info: null,
+    config: {}
 };
 
 (function($) {
@@ -28,7 +29,25 @@ window.LilacToast = {
         
         // Process URL parameters for toast messages
         processUrlToasts();
+        
+        // Load extensions if they exist
+        loadExtensions();
     });
+    
+    /**
+     * Load and initialize toast extensions
+     */
+    const loadExtensions = function() {
+        // Session management extension
+        if (typeof window.LilacToast.session !== 'undefined') {
+            window.LilacToast.session.init();
+        }
+        
+        // Test timer extension
+        if (typeof window.LilacToast.testTimer !== 'undefined') {
+            window.LilacToast.testTimer.init();
+        }
+    };
 
     /**
      * Show a toast notification
@@ -80,6 +99,29 @@ window.LilacToast = {
             });
         }
         
+        // Add buttons if provided
+        if (settings.buttons && settings.buttons.length > 0) {
+            const $buttonContainer = $('<div class="toast-buttons"></div>');
+            
+            settings.buttons.forEach(button => {
+                const $button = $(`<button class="${button.class || ''}">${button.text}</button>`);
+                
+                if (button.click) {
+                    $button.on('click', function(e) {
+                        e.stopPropagation();
+                        const shouldClose = button.click.call(this, $toast[0]);
+                        if (shouldClose !== false) {
+                            closeToast($toast, settings.onClose);
+                        }
+                    });
+                }
+                
+                $buttonContainer.append($button);
+            });
+            
+            $toast.append($buttonContainer);
+        }
+        
         // Add to container
         $('#lilac-toast-container').append($toast);
         
@@ -88,11 +130,14 @@ window.LilacToast = {
             $toast.addClass('show');
         }, 10);
         
-        // Auto-close after duration (if set)
+        // Auto-close after duration (if set and greater than 0)
         if (settings.duration > 0) {
-            setTimeout(function() {
+            const timeoutId = setTimeout(function() {
                 closeToast($toast, settings.onClose);
             }, settings.duration);
+            
+            // Store the timeout ID so it can be cleared if needed
+            $toast.data('timeoutId', timeoutId);
         }
         
         // Return the toast element for potential future reference
@@ -197,6 +242,15 @@ window.LilacToast = {
         });
     };
     
+    /**
+     * Backward compatibility: Add showToast method for existing code
+     * This allows existing code that uses LilacToast.showToast() to continue working
+     */
+    window.LilacToast.showToast = function(options) {
+        console.log('Using LilacToast.showToast (backward compatibility mode)');
+        return window.LilacShowToast(options);
+    };
+    
     // Log that all functionality is now available
     console.log('Lilac Toast API Ready');
     
@@ -228,23 +282,139 @@ window.LilacToast = {
     });
     
     /**
-     * Convert standard alerts to toasts
+     * Alert System Integration
+     * Convert standard JavaScript dialogs (alert, confirm, prompt) to toasts
      */
+    
+    // Store original dialog functions
     const originalAlert = window.alert;
-    window.alert = function(message) {
-        // Use LilacShowToast directly since it's always available
-        // LilacToast helper might not be ready when alert is called
-        if (typeof window.LilacShowToast === 'function') {
-            window.LilacShowToast({
-                message: message,
-                type: 'info',
-                title: 'Alert',
-                duration: 5000
-            });
-        } else {
-            // Fall back to original alert if toast system isn't available
-            originalAlert(message);
+    const originalConfirm = window.confirm;
+    const originalPrompt = window.prompt;
+    
+    // Track alert statistics for debugging
+    window.LilacAlertStats = {
+        alertCount: 0,
+        confirmCount: 0,
+        promptCount: 0,
+        lastAlert: null,
+        reset: function() {
+            this.alertCount = 0;
+            this.confirmCount = 0;
+            this.promptCount = 0;
+            this.lastAlert = null;
         }
+    };
+    
+    /**
+     * Enhanced alert integration with toast system
+     * @param {string} message - The message to display
+     * @param {Object} options - Optional configuration options
+     */
+    window.alert = function(message, options = {}) {
+        // Track alert usage
+        window.LilacAlertStats.alertCount++;
+        window.LilacAlertStats.lastAlert = {
+            type: 'alert',
+            message: message,
+            timestamp: new Date()
+        };
+        
+        // If toast system isn't available or is disabled, use original alert
+        if (typeof window.LilacShowToast !== 'function' || options.useNative === true) {
+            return originalAlert(message);
+        }
+        
+        // Merge default options with provided options
+        const settings = $.extend({
+            type: 'info',
+            title: 'Alert',
+            duration: 5000,
+            position: 'top-right',
+            closable: true,
+            cssClass: 'lilac-alert-toast'
+        }, options);
+        
+        // Show as toast notification
+        return window.LilacShowToast({
+            message: message,
+            type: settings.type,
+            title: settings.title,
+            duration: settings.duration,
+            position: settings.position,
+            closable: settings.closable,
+            cssClass: settings.cssClass
+        });
+    };
+    
+    /**
+     * Enhanced confirm dialog integration
+     * @param {string} message - The confirmation message
+     * @param {Object} options - Optional configuration options
+     * @returns {boolean} - User's response (true for OK, false for Cancel)
+     */
+    window.confirm = function(message, options = {}) {
+        // Track confirm usage
+        window.LilacAlertStats.confirmCount++;
+        window.LilacAlertStats.lastAlert = {
+            type: 'confirm',
+            message: message,
+            timestamp: new Date()
+        };
+        
+        // For now, use the original confirm (we'll implement a toast-based version later)
+        // This is a placeholder for future implementation
+        return originalConfirm(message);
+    };
+    
+    /**
+     * Enhanced prompt dialog integration
+     * @param {string} message - The prompt message
+     * @param {string} defaultValue - Default input value
+     * @param {Object} options - Optional configuration options
+     * @returns {string|null} - User's input or null if canceled
+     */
+    window.prompt = function(message, defaultValue = '', options = {}) {
+        // Track prompt usage
+        window.LilacAlertStats.promptCount++;
+        window.LilacAlertStats.lastAlert = {
+            type: 'prompt',
+            message: message,
+            timestamp: new Date()
+        };
+        
+        // For now, use the original prompt (we'll implement a toast-based version later)
+        // This is a placeholder for future implementation
+        return originalPrompt(message, defaultValue);
+    };
+    
+    /**
+     * Test function to verify the alert integration is working
+     * Call LilacToastTest() in the console to test all notification types
+     */
+    window.LilacToastTest = function() {
+        console.log('Testing Lilac Toast System...');
+        
+        // Test standard alert
+        alert('This is a test alert');
+        
+        // Test toast notifications
+        setTimeout(function() {
+            window.LilacToast.success('Success message test');
+        }, 1000);
+        
+        setTimeout(function() {
+            window.LilacToast.error('Error message test');
+        }, 2000);
+        
+        setTimeout(function() {
+            window.LilacToast.warning('Warning message test');
+        }, 3000);
+        
+        setTimeout(function() {
+            window.LilacToast.info('Info message test');
+        }, 4000);
+        
+        return 'Test sequence initiated - check for toast notifications';
     };
     
 })(jQuery);
