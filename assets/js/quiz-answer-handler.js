@@ -142,11 +142,11 @@ jQuery(document).ready(function($) {
                 $body.addClass('quiz-type-forced-hint');
             }
             
-            // Remove Next/Submit buttons
+            // Remove Next/Submit buttons but keep the check button
             $('input[name="next"], input[value="Next"], input[value="הבא"], input[value="סיים מבחן"], input[value="Complete Quiz"]').each(function() {
                 const $btn = $(this);
-                // Only remove if not already processed
-                if (!$btn.hasClass('processed-by-quiz-handler')) {
+                // Only remove if not already processed and not the check button
+                if (!$btn.hasClass('processed-by-quiz-handler') && $btn.attr('name') !== 'check') {
                     $btn.addClass('processed-by-quiz-handler').remove();
                 }
             });
@@ -154,7 +154,7 @@ jQuery(document).ready(function($) {
             // Remove any button containers that might contain Next buttons
             $('.wpProQuiz_QuestionButton').filter(function() {
                 const $btn = $(this);
-                if ($btn.hasClass('processed-by-quiz-handler')) return false;
+                if ($btn.hasClass('processed-by-quiz-handler') || $btn.attr('name') === 'check') return false;
                 
                 const val = ($btn.val() || '').toString();
                 const shouldRemove = ['Next', 'הבא', 'סיים מבחן', 'Complete Quiz'].some(text => val.includes(text));
@@ -166,13 +166,35 @@ jQuery(document).ready(function($) {
                 return false;
             }).remove();
             
-            // Ensure the hint button is visible and styled
+            // Ensure the hint and check buttons are visible and styled
             $('.wpProQuiz_QuestionButton[value="Hint"]')
                 .addClass('hint-button')
                 .css({
                     'display': 'inline-block',
                     'visibility': 'visible',
                     'opacity': '1'
+                });
+                
+            // Ensure the check button is visible and styled
+            $('input[name="check"]')
+                .css({
+                    'display': 'inline-block !important',
+                    'visibility': 'visible !important',
+                    'opacity': '1 !important',
+                    'position': 'relative !important',
+                    'pointer-events': 'auto !important',
+                    'background-color': '#4CAF50 !important',
+                    'color': 'white !important',
+                    'font-weight': 'bold !important',
+                    'border': '2px solid #2E7D32 !important',
+                    'border-radius': '4px !important',
+                    'padding': '8px 24px !important',
+                    'cursor': 'pointer !important',
+                    'font-size': '16px !important',
+                    'margin-right': '10px !important',
+                    'box-shadow': '0 3px 5px rgba(0,0,0,0.2) !important',
+                    'float': 'right !important',
+                    'z-index': '1000 !important'
                 });
         }
     }
@@ -242,7 +264,79 @@ jQuery(document).ready(function($) {
 
     // Run initialization
     init();
+    
+    // Set up a dedicated observer for the check button
+    function setupCheckButtonObserver() {
+        const checkButtonObserver = new MutationObserver(function(mutations) {
+            $('input[name="check"]').each(function() {
+                const $btn = $(this);
+                if ($btn.css('display') === 'none' || 
+                    $btn.css('visibility') === 'hidden' || 
+                    $btn.css('opacity') === '0' ||
+                    $btn.css('pointer-events') === 'none') {
+                    
+                    $btn.css({
+                        'display': 'inline-block !important',
+                        'visibility': 'visible !important',
+                        'opacity': '1 !important',
+                        'position': 'relative !important',
+                        'pointer-events': 'auto !important',
+                        'background-color': '#4CAF50 !important',
+                        'color': 'white !important',
+                        'font-weight': 'bold !important',
+                        'border': '2px solid #2E7D32 !important',
+                        'border-radius': '4px !important',
+                        'padding': '8px 24px !important',
+                        'cursor': 'pointer !important',
+                        'font-size': '16px !important',
+                        'margin-right': '10px !important',
+                        'box-shadow': '0 3px 5px rgba(0,0,0,0.2) !important',
+                        'float': 'right !important',
+                        'z-index': '1000 !important',
+                        'height': 'auto !important',
+                        'width': 'auto !important',
+                        'line-height': 'normal !important'
+                    });
+                }
+            });
+        });
 
+        // Start observing the document with the configured parameters
+        checkButtonObserver.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+        
+        // Also run immediately
+        $('input[name="check"]').css({
+            'display': 'inline-block !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important',
+            'position': 'relative !important',
+            'pointer-events': 'auto !important',
+            'background-color': '#4CAF50 !important',
+            'color': 'white !important',
+            'font-weight': 'bold !important',
+            'border': '2px solid #2E7D32 !important',
+            'border-radius': '4px !important',
+            'padding': '8px 24px !important',
+            'cursor': 'pointer !important',
+            'font-size': '16px !important',
+            'margin-right': '10px !important',
+            'box-shadow': '0 3px 5px rgba(0,0,0,0.2) !important',
+            'float': 'right !important',
+            'z-index': '1000 !important',
+            'height': 'auto !important',
+            'width': 'auto !important',
+            'line-height': 'normal !important'
+        });
+    }
+    
+    // Initialize the check button observer
+    setupCheckButtonObserver();
+    
     // Also run on LearnDash quiz page load event
     $(document).on('sfwd-quiz-page-loaded', function() {
         removeUnwantedButtons();

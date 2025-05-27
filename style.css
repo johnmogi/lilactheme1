@@ -25,6 +25,28 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
  * Custom styles specific to this child theme
  */
 
+
+ .lilac-profile-pic img {
+    float: right;
+    width: 30px;
+    margin-left: 5px;
+    height: auto;
+    max-width: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+ }
+ .lilac-profile-links {
+    max-width: 150px;
+    float: right;
+ }
+.lilac-profile-details h3{
+    font-size: 12px;
+    color: white;
+    float: right;
+    margin-left: 15px;
+}
+
 /* ===== Utility Classes ===== */
 .highlight-effect {
     background-color: var(--color-highlight, yellow) !important;

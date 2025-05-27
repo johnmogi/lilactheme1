@@ -103,7 +103,7 @@
 
     // Show the test timer toast
     const showTimerToast = function() {
-        if (timeLeftToast) return;
+        if (!timeLeftToast) return;
         
         timeLeftToast = window.LilacShowToast({
             title: 'Time Remaining',

@@ -17,8 +17,7 @@ window.LilacToast = {
 (function($) {
     'use strict';
     
-    // Log initialization
-    console.log('Lilac Toast System Initializing...');
+    // Initialization - logs removed for production
 
     // Initialize the toast system
     $(document).ready(function() {
@@ -251,8 +250,7 @@ window.LilacToast = {
         return window.LilacShowToast(options);
     };
     
-    // Log that all functionality is now available
-    console.log('Lilac Toast API Ready');
+    // Toast API is now available
     
     /**
      * Handle AJAX errors and show them as toasts

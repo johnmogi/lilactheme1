@@ -10,8 +10,6 @@
     
     // Make sure the toast system is loaded
     $(document).ready(function() {
-        console.log('Lilac Alert Helpers Initializing...');
-        
         // Initialize the LilacAlert namespace if it doesn't exist
         if (!window.LilacAlert) {
             window.LilacAlert = {};
@@ -113,7 +111,6 @@
         window.alert = window.originalAlert || alert;
     };
     
-    // Log that all functionality is now available
-    console.log('Lilac Alert Helpers Ready');
+    // Alert helpers initialized
     
 })(jQuery);

@@ -117,6 +117,22 @@ function hello_elementor_child_scripts_styles() {
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_scripts_styles', 20);
 
+/**
+ * Enqueue progress bar styles
+ */
+function enqueue_progress_bar_styles() {
+    // Only load on quiz pages
+    if (is_singular('sfwd-quiz')) {
+        wp_enqueue_style(
+            'progress-bar-styles',
+            get_stylesheet_directory_uri() . '/assets/css/progress-bar.css',
+            array(),
+            filemtime(get_stylesheet_directory() . '/assets/css/progress-bar.css')
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'enqueue_progress_bar_styles', 99);
+
 // Load other theme files
 require_once get_stylesheet_directory() . '/inc/shortcodes/loader.php';
 

@@ -727,7 +727,7 @@ function hello_elementor_get_question_acf_media() {
     // If still no content, use the specified fallback image
     if (empty($media_html) || (strpos($media_html, '<img') === false && strpos($media_html, '<iframe') === false)) {
         // Use the specified fallback image
-        $fallback_image_url = 'http://lilacquiz.local/wp-content/uploads/2025/05/noPic.png';
+        $fallback_image_url = '/wp-content/uploads/2025/05/noPic.png';
         $image_html = '<img src="' . esc_url($fallback_image_url) . '" alt="No Media Available" class="fallback-image">';
         
         $media_html = '<div class="media-content question-media-image">' . $image_html . '</div>';
