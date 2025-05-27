@@ -1,7 +1,7 @@
 
 
 .learndash-wrapper .wpProQuiz_content .wpProQuiz_questionListItem:not(.ld-sortable__item).wpProQuiz_answerCorrectIncomplete label {
-    border-color: none !important;
+    border-color: #e2e7ed !important;
 }
 
 /* Progress Bar with Navigation */
